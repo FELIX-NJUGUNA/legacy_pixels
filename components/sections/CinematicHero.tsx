@@ -9,16 +9,18 @@ import Link from "next/link";
 const STRIP_A = [
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1637_svyzui.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904289/LEGACY_5156_rym17y.jpg",
-  "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=700&q=85",
-  "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=700&q=85",
-  "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=700&q=85",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1783668868/LEGACY_1150_ik36af.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1783668865/DSC_0853_rxdzhu.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1783669501/LEGACY_4700_zpfrxv.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1783669502/LEGACY_6145_hb9ykv.jpg"
 ];
 const STRIP_B = [
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1681_br4ibp.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904290/LEGACY_2858_exohkc.jpg",
-  "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=700&q=85",
-  "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=700&q=85",
-  "https://images.unsplash.com/photo-1524593166156-312f362cada0?w=700&q=85",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1783668867/DSC_0860_taeyo1.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1783668865/LEGACY_1121_sv6ovt.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1783669503/LEGACY_5896_rewno4.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1783669500/LEGACY_1233_twnx9m.jpg"
 ];
 
 /* ══════════════════════════════════════════
@@ -43,8 +45,7 @@ const PHASES = [
 ];
 
 /* ══════════════════════════════════════════
-   TICK MARKS — computed once at module load,
-   never rebuilt on render
+   TICK MARKS — computed once at module load
 ══════════════════════════════════════════ */
 const TICK_MARKS = Array.from({ length: 72 }, (_, i) => {
   const a = (i / 72) * Math.PI * 2;
@@ -62,8 +63,7 @@ const TICK_MARKS = Array.from({ length: 72 }, (_, i) => {
 });
 
 /* ══════════════════════════════════════════
-   CAMERA APERTURE — CSS-driven rotation,
-   memoized so scroll updates never re-render it
+   CAMERA APERTURE
 ══════════════════════════════════════════ */
 const CameraAperture = memo(function CameraAperture() {
   return (
@@ -107,7 +107,6 @@ const CameraAperture = memo(function CameraAperture() {
           <feGaussianBlur stdDeviation="5" result="b" />
           <feComposite in="SourceGraphic" in2="b" operator="over" />
         </filter>
-        {/* Blade glow — applied once to the whole rotating group */}
         <filter id="cbg" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="2.5" result="b" />
           <feComposite in="SourceGraphic" in2="b" operator="over" />
@@ -129,7 +128,6 @@ const CameraAperture = memo(function CameraAperture() {
         />
       ))}
 
-      {/* ── Rotating blade group — CSS-driven, single filter pass ── */}
       <g className="cam-blade-group" filter="url(#cbg)">
         {Array.from({ length: 8 }, (_, i) => (
           <g key={i} transform={`rotate(${i * 45},200,200)`}>
@@ -162,6 +160,37 @@ const CameraAperture = memo(function CameraAperture() {
 });
 
 /* ══════════════════════════════════════════
+   ASPECT RATIO DETECTION
+   Loads each image once, reads its real
+   width/height, and hands back a ratio
+   (clamped so one wild photo can't blow up
+   the row rhythm) instead of forcing every
+   photo into one fixed-height box.
+══════════════════════════════════════════ */
+function useAspectRatios(images: string[]) {
+  const [ratios, setRatios] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    images.forEach((src) => {
+      const img = new window.Image();
+      img.onload = () => {
+        if (cancelled) return;
+        const raw = img.naturalWidth / img.naturalHeight;
+        const clamped = Math.max(0.55, Math.min(1.9, raw)); // tall-portrait .. wide-landscape
+        setRatios((prev) => (prev[src] ? prev : { ...prev, [src]: clamped }));
+      };
+      img.src = src;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [images]);
+
+  return ratios;
+}
+
+/* ══════════════════════════════════════════
    FRAMELESS IMAGE STRIP
 ══════════════════════════════════════════ */
 const ImageStrip = memo(function ImageStrip({
@@ -173,7 +202,9 @@ const ImageStrip = memo(function ImageStrip({
   direction: "up" | "down";
   speed: number;
 }) {
+  const ratios = useAspectRatios(images);
   const doubled = [...images, ...images];
+
   return (
     <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
       <div
@@ -185,7 +216,14 @@ const ImageStrip = memo(function ImageStrip({
         }}
       >
         {doubled.map((url, i) => (
-          <div key={i} style={{ flexShrink: 0, height: "280px", overflow: "hidden" }}>
+          <div
+            key={i}
+            style={{
+              flexShrink: 0,
+              aspectRatio: ratios[url] ?? 1.5, // neutral landscape guess until measured
+              overflow: "hidden",
+            }}
+          >
             <img
               src={url}
               alt=""
@@ -206,8 +244,6 @@ export default function CinematicHero() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [prog, setProg] = useState(0);
 
-  /* ── Scroll tracking — rAF-throttled so we update
-     at most once per frame, not once per scroll event ── */
   useEffect(() => {
     let ticking = false;
 
@@ -229,35 +265,25 @@ export default function CinematicHero() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ── Phase boundaries ──
-     0 → 0.28 : aperture visible, text set 1
-     0.28 → 0.64 : zooming in,    text set 2
-     0.64 → 1    : gallery open,  text set 3
-  */
   const phase = prog < 0.28 ? 0 : prog < 0.64 ? 1 : 2;
 
-  /* Aperture zoom: eased power curve, starts at 0.22 */
   const zT     = Math.max(0, Math.min(1, (prog - 0.22) / 0.46));
   const aScale = 1 + Math.pow(zT, 2.2) * 32;
 
-  /* Aperture opacity: fade in 0→0.1, hold, fade out 0.6→0.76 */
   const aOpacity =
     prog < 0.1  ? prog / 0.1 :
     prog < 0.60 ? 1 :
     prog < 0.76 ? 1 - (prog - 0.60) / 0.16 :
     0;
 
-  /* Gallery opacity: fade in 0.66→0.80 */
   const gOpacity = prog < 0.66 ? 0 : prog < 0.80 ? (prog - 0.66) / 0.14 : 1;
 
-  /* Exit blackout: fade in 0.9→1 for smooth hand-off */
   const exitBlack = prog < 0.90 ? 0 : (prog - 0.90) / 0.10;
 
   const ph = PHASES[phase];
 
   return (
     <>
-      {/* ── CSS keyframes ── */}
       <style>{`
         @keyframes lp-up   { from { transform: translateY(0);    } to { transform: translateY(-50%); } }
         @keyframes lp-down { from { transform: translateY(-50%); } to { transform: translateY(0);    } }
@@ -272,10 +298,7 @@ export default function CinematicHero() {
         }
       `}</style>
 
-      {/* ── Outer scroll container — gives us scroll distance ── */}
       <div ref={wrapRef} style={{ height: "520vh", position: "relative" }}>
-
-        {/* ── Sticky viewport ── */}
         <div
           style={{
             position: "sticky",
@@ -286,14 +309,11 @@ export default function CinematicHero() {
             fontFamily: "Georgia, 'Times New Roman', serif",
           }}
         >
-
-          {/* Radial atmosphere */}
           <div style={{
             position: "absolute", inset: 0, pointerEvents: "none",
             background: "radial-gradient(ellipse at 64% 46%, #130a0c 0%, #060608 68%)",
           }} />
 
-          {/* ── Gallery (behind everything) ── */}
           <div style={{
             position: "absolute", inset: 0,
             display: "flex", gap: "5px",
@@ -303,7 +323,6 @@ export default function CinematicHero() {
             <ImageStrip images={STRIP_B} direction="down" speed={30} />
           </div>
 
-          {/* Gallery dark veil — keeps text readable */}
           <div style={{
             position: "absolute", inset: 0,
             background: "rgba(6,6,8,0.52)",
@@ -311,14 +330,12 @@ export default function CinematicHero() {
             pointerEvents: "none",
           }} />
 
-          {/* Left text gradient */}
           <div style={{
             position: "absolute", inset: 0, pointerEvents: "none", zIndex: 3,
             background:
               "linear-gradient(to right, rgba(6,6,8,0.92) 0%, rgba(6,6,8,0.55) 54%, transparent 100%)",
           }} />
 
-          {/* Aperture ambient glow halo */}
           <div style={{
             position: "absolute", top: "50%", left: "50%",
             transform: "translate(-50%,-50%)",
@@ -328,7 +345,6 @@ export default function CinematicHero() {
             opacity: aOpacity, zIndex: 3, pointerEvents: "none",
           }} />
 
-          {/* ── Camera aperture ── */}
           <div style={{
             position: "absolute", top: "50%", left: "50%", zIndex: 4,
             transform: `translate(-50%,-50%) scale(${aScale})`,
@@ -340,13 +356,11 @@ export default function CinematicHero() {
             <CameraAperture />
           </div>
 
-          {/* ── Text overlay ── */}
           <div style={{
             position: "absolute", top: "50%", left: "8%",
             transform: "translateY(-50%)",
             zIndex: 10, maxWidth: "460px",
           }}>
-            {/* Tag */}
             <div
               key={`tag-${phase}`}
               style={{
@@ -361,7 +375,6 @@ export default function CinematicHero() {
               {ph.tag}
             </div>
 
-            {/* Headline lines */}
             <div key={`hl-${phase}`}>
               {ph.lines.map((line, i) => (
                 <div
@@ -381,7 +394,6 @@ export default function CinematicHero() {
               ))}
             </div>
 
-            {/* Sub copy */}
             <p
               key={`sub-${phase}`}
               style={{
@@ -394,7 +406,6 @@ export default function CinematicHero() {
               {ph.sub}
             </p>
 
-            {/* CTAs — visible only in phase 2 */}
             {phase === 2 && (
               <div
                 style={{
@@ -446,7 +457,6 @@ export default function CinematicHero() {
             )}
           </div>
 
-          {/* ── Stats — phase 0 and 2 ── */}
           {phase !== 1 && (
             <div
               key={`st-${phase}`}
@@ -473,7 +483,6 @@ export default function CinematicHero() {
             </div>
           )}
 
-          {/* ── Phase progress indicator (right edge) ── */}
           <div style={{
             position: "absolute", right: "2rem", top: "50%",
             transform: "translateY(-50%)",
@@ -491,7 +500,6 @@ export default function CinematicHero() {
             ))}
           </div>
 
-          {/* ── Scroll nudge (visible before user scrolls) ── */}
           {prog < 0.04 && (
             <div style={{
               position: "absolute", bottom: "2.2rem", right: "3rem",
@@ -515,14 +523,12 @@ export default function CinematicHero() {
             </div>
           )}
 
-          {/* ── Bottom page fade ── */}
           <div style={{
             position: "absolute", bottom: 0, left: 0, right: 0, height: "9rem",
             background: "linear-gradient(to top, #060608, transparent)",
             zIndex: 5, pointerEvents: "none",
           }} />
 
-          {/* ── Exit blackout — smooth hand-off to next section ── */}
           <div style={{
             position: "absolute", inset: 0,
             background: "#060608",
@@ -530,11 +536,8 @@ export default function CinematicHero() {
             zIndex: 20, pointerEvents: "none",
             transition: "opacity 0.05s linear",
           }} />
-
         </div>
-        {/* /sticky */}
       </div>
-      {/* /scroll container */}
     </>
   );
 }

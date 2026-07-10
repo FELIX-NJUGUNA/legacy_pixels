@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects, type Category } from "@/lib/portfolio-data";
 
-const categories: Category[] = ["All", "Editorial", "Weddings", "Commercial", "Film"];
+const categories: Category[] = ["All", "Street Photography", "Weddings", "Graduation", "Creative Works", "Picnics", "Studio Works"];
 
 export default function Portfolio() {
   const [active, setActive] = useState<Category>("All");
@@ -50,11 +50,10 @@ export default function Portfolio() {
             <button
               key={cat}
               onClick={() => setActive(cat)}
-              className={`label-text text-[0.65rem] px-5 py-2 border transition-all duration-300 ${
-                active === cat
-                  ? "border-gold bg-gold text-void"
+              className={`label-text text-[0.65rem] px-5 py-2 border transition-all duration-300 ${active === cat
+                  ? "border-gold bg-gold !text-void"
                   : "border-white/10 text-mist hover:border-gold/50 hover:text-gold"
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -62,10 +61,10 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid → Masonry */}
       <motion.div
         layout
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        className="columns-1 md:columns-2 lg:columns-3 gap-4 [column-fill:_balance]"
       >
         <AnimatePresence>
           {filtered.map((project, i) => (
@@ -76,28 +75,23 @@ export default function Portfolio() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4, delay: i * 0.06 }}
-              className={`portfolio-item group ${
-                project.aspect === "landscape" && i % 5 === 0
-                  ? "md:col-span-2"
-                  : ""
-              }`}
+              className="portfolio-item group mb-4 break-inside-avoid"
               onMouseEnter={() => setHovered(project.id)}
               onMouseLeave={() => setHovered(null)}
             >
-              <div
-                className={`relative overflow-hidden bg-graphite ${
-                  project.aspect === "portrait"
-                    ? "aspect-[3/4]"
-                    : project.aspect === "square"
-                    ? "aspect-square"
-                    : "aspect-[16/10]"
-                }`}
-              >
+              <div className="relative overflow-hidden bg-graphite">
                 <Image
                   src={project.image}
                   alt={project.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.07]"
+                  width={800}
+                  height={
+                    project.aspect === "portrait"
+                      ? 1067
+                      : project.aspect === "square"
+                        ? 800
+                        : 500
+                  }
+                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.07]"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
 
@@ -111,10 +105,7 @@ export default function Portfolio() {
                   </p>
                   <h3
                     className="text-silk text-xl mb-3"
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 300,
-                    }}
+                    style={{ fontFamily: "var(--font-display)", fontWeight: 300 }}
                   >
                     {project.title}
                   </h3>

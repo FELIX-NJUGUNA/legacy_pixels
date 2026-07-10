@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const navLinks = [
   { label: "Work", href: "/#portfolio" },
   { label: "Services", href: "/#services" },
+  { label: "Packages", href: "/#packages"},
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -129,7 +130,7 @@ export default function Navbar() {
               className="mt-8"
             >
               <Link
-                href="/contact"
+                href="/#packages"
                 onClick={() => setMenuOpen(false)}
                 className="border border-gold text-gold label-text px-8 py-3"
               >
