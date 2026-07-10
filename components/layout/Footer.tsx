@@ -9,9 +9,11 @@ const socials = [
 
 const links = [
   { label: "Portfolio", href: "/#portfolio" },
+  { label: "About", href: "/#about" },
   { label: "Services", href: "/#services" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { label: "Packages", href: "/#packages" },
+  
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Footer() {

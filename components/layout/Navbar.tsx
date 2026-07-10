@@ -6,9 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
   { label: "Work", href: "/#portfolio" },
-  { label: "Services", href: "/#services" },
-  { label: "Packages", href: "/#packages"},
   { label: "About", href: "/about" },
+  { label: "Services", href: "/#services" },
+  { label: "Packages", href: "/#packages" },
+
   { label: "Contact", href: "/contact" },
 ];
 
@@ -28,11 +29,10 @@ export default function Navbar() {
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.2 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
             ? "bg-void/80 backdrop-blur-md border-b border-white/5"
             : "bg-transparent"
-        }`}
+          }`}
       >
         <nav className="max-w-screen-xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
           {/* Logo */}
