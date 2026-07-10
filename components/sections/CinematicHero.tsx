@@ -1,21 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import Link from "next/link";
 
 /* ══════════════════════════════════════════
    IMAGE CATALOG
 ══════════════════════════════════════════ */
 const STRIP_A = [
-  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=85",
-  "https://images.unsplash.com/photo-1519741497674-611481863552?w=700&q=85",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1637_svyzui.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1779904289/LEGACY_5156_rym17y.jpg",
   "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=700&q=85",
   "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=700&q=85",
   "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=700&q=85",
 ];
 const STRIP_B = [
-  "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=700&q=85",
-  "https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=700&q=85",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1681_br4ibp.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1779904290/LEGACY_2858_exohkc.jpg",
   "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=700&q=85",
   "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=700&q=85",
   "https://images.unsplash.com/photo-1524593166156-312f362cada0?w=700&q=85",
@@ -43,9 +43,29 @@ const PHASES = [
 ];
 
 /* ══════════════════════════════════════════
-   CAMERA APERTURE — SVG, imperative RAF
+   TICK MARKS — computed once at module load,
+   never rebuilt on render
 ══════════════════════════════════════════ */
-function CameraAperture() {
+const TICK_MARKS = Array.from({ length: 72 }, (_, i) => {
+  const a = (i / 72) * Math.PI * 2;
+  const maj = i % 9 === 0;
+  const r1 = 193;
+  const r2 = maj ? 177 : 186;
+  return {
+    key: i,
+    x1: 200 + Math.cos(a) * r1,
+    y1: 200 + Math.sin(a) * r1,
+    x2: 200 + Math.cos(a) * r2,
+    y2: 200 + Math.sin(a) * r2,
+    maj,
+  };
+});
+
+/* ══════════════════════════════════════════
+   CAMERA APERTURE — CSS-driven rotation,
+   memoized so scroll updates never re-render it
+══════════════════════════════════════════ */
+const CameraAperture = memo(function CameraAperture() {
   return (
     <svg
       viewBox="0 0 400 400"
@@ -87,7 +107,7 @@ function CameraAperture() {
           <feGaussianBlur stdDeviation="5" result="b" />
           <feComposite in="SourceGraphic" in2="b" operator="over" />
         </filter>
-        {/* Blade glow — applied ONCE to the whole rotating group now */}
+        {/* Blade glow — applied once to the whole rotating group */}
         <filter id="cbg" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="2.5" result="b" />
           <feComposite in="SourceGraphic" in2="b" operator="over" />
@@ -100,23 +120,16 @@ function CameraAperture() {
       <circle cx="200" cy="200" r="193" fill="none" stroke="#E8610A" strokeWidth="1.2" opacity="0.45" />
       <circle cx="200" cy="200" r="185" fill="none" stroke="#FF8C3B" strokeWidth="0.5" opacity="0.18" />
 
-      {Array.from({ length: 72 }, (_, i) => {
-        const a   = (i / 72) * Math.PI * 2;
-        const maj = i % 9 === 0;
-        const r1  = 193;
-        const r2  = maj ? 177 : 186;
-        return (
-          <line key={i}
-            x1={200 + Math.cos(a) * r1} y1={200 + Math.sin(a) * r1}
-            x2={200 + Math.cos(a) * r2} y2={200 + Math.sin(a) * r2}
-            stroke={maj ? "#FF8C3B" : "#E8610A"}
-            strokeWidth={maj ? 2 : 0.7}
-            opacity={maj ? 0.7 : 0.22}
-          />
-        );
-      })}
+      {TICK_MARKS.map(t => (
+        <line key={t.key}
+          x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2}
+          stroke={t.maj ? "#FF8C3B" : "#E8610A"}
+          strokeWidth={t.maj ? 2 : 0.7}
+          opacity={t.maj ? 0.7 : 0.22}
+        />
+      ))}
 
-      {/* ── Rotating blade group — CSS-driven, filter applied once ── */}
+      {/* ── Rotating blade group — CSS-driven, single filter pass ── */}
       <g className="cam-blade-group" filter="url(#cbg)">
         {Array.from({ length: 8 }, (_, i) => (
           <g key={i} transform={`rotate(${i * 45},200,200)`}>
@@ -146,12 +159,12 @@ function CameraAperture() {
         fill="none" stroke="#E8610A" strokeWidth="12" opacity="0.06" />
     </svg>
   );
-}
+});
 
 /* ══════════════════════════════════════════
    FRAMELESS IMAGE STRIP
 ══════════════════════════════════════════ */
-function ImageStrip({
+const ImageStrip = memo(function ImageStrip({
   images,
   direction,
   speed,
@@ -160,7 +173,6 @@ function ImageStrip({
   direction: "up" | "down";
   speed: number;
 }) {
-  /* Double for seamless CSS loop */
   const doubled = [...images, ...images];
   return (
     <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
@@ -185,24 +197,35 @@ function ImageStrip({
       </div>
     </div>
   );
-}
+});
 
 /* ══════════════════════════════════════════
    MAIN — CINEMATIC HERO
 ══════════════════════════════════════════ */
 export default function CinematicHero() {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [prog,  setProg]  = useState(0);
+  const [prog, setProg] = useState(0);
 
-  /* ── Scroll tracking ── */
+  /* ── Scroll tracking — rAF-throttled so we update
+     at most once per frame, not once per scroll event ── */
   useEffect(() => {
-    const onScroll = () => {
+    let ticking = false;
+
+    const update = () => {
       if (!wrapRef.current) return;
       const maxScroll = wrapRef.current.offsetHeight - window.innerHeight;
       setProg(Math.max(0, Math.min(1, window.scrollY / maxScroll)));
+      ticking = false;
     };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    update();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -214,8 +237,8 @@ export default function CinematicHero() {
   const phase = prog < 0.28 ? 0 : prog < 0.64 ? 1 : 2;
 
   /* Aperture zoom: eased power curve, starts at 0.22 */
-  const zT      = Math.max(0, Math.min(1, (prog - 0.22) / 0.46));
-  const aScale  = 1 + Math.pow(zT, 2.2) * 32;
+  const zT     = Math.max(0, Math.min(1, (prog - 0.22) / 0.46));
+  const aScale = 1 + Math.pow(zT, 2.2) * 32;
 
   /* Aperture opacity: fade in 0→0.1, hold, fade out 0.6→0.76 */
   const aOpacity =

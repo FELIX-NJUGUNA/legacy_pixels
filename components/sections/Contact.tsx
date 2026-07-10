@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { Mail, MapPin, Clock } from "lucide-react";
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -32,6 +33,12 @@ export default function Contact() {
       focused === name ? "border-gold" : "border-white/10"
     }`;
 
+  const contactItems = [
+    { Icon: Mail, label: "Email", value: "hello@legacypixels.co.ke" },
+    { Icon: MapPin, label: "Location", value: "Nairobi, Kenya" },
+    { Icon: Clock, label: "Response Time", value: "Within 24 hours" },
+  ];
+
   return (
     <section
       id="contact"
@@ -51,22 +58,16 @@ export default function Contact() {
           </p>
 
           <div className="space-y-8">
-            {[
-              { icon: "✉", label: "Email", value: "hello@legacypixels.co.ke" },
-              { icon: "📍", label: "Location", value: "Nairobi, Kenya" },
-              {
-                icon: "⏱",
-                label: "Response Time",
-                value: "Within 24 hours",
-              },
-            ].map((item) => (
-              <div key={item.label} className="flex items-start gap-5">
-                <span className="text-gold text-lg mt-0.5">{item.icon}</span>
+            {contactItems.map(({ Icon, label, value }) => (
+              <div key={label} className="flex items-start gap-5">
+                <span className="flex items-center justify-center w-9 h-9 rounded-full border border-gold/30 text-gold mt-0.5 shrink-0">
+                  <Icon size={15} strokeWidth={1.5} />
+                </span>
                 <div>
                   <p className="label-text text-[0.6rem] text-mist/40 mb-1">
-                    {item.label}
+                    {label}
                   </p>
-                  <p className="text-silk text-sm">{item.value}</p>
+                  <p className="text-silk text-sm">{value}</p>
                 </div>
               </div>
             ))}
