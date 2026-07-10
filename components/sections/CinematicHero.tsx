@@ -46,71 +46,60 @@ const PHASES = [
    CAMERA APERTURE — SVG, imperative RAF
 ══════════════════════════════════════════ */
 function CameraAperture() {
-  const bladeRef = useRef<SVGGElement>(null);
-  const rafRef   = useRef<number>(0);
-
-  useEffect(() => {
-    let angle = 0;
-    let last: number | null = null;
-    const tick = (t: number) => {
-      if (last !== null) angle += (t - last) * 0.014;
-      last = t;
-      if (bladeRef.current)
-        bladeRef.current.setAttribute("transform", `rotate(${angle % 360},200,200)`);
-      rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, []);
-
   return (
     <svg
       viewBox="0 0 400 400"
       xmlns="http://www.w3.org/2000/svg"
       style={{ width: "100%", height: "100%", overflow: "visible" }}
     >
+      <style>{`
+        .cam-blade-group {
+          transform-box: view-box;
+          transform-origin: 200px 200px;
+          animation: cam-spin 16s linear infinite;
+          will-change: transform;
+        }
+        @keyframes cam-spin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cam-blade-group { animation: none; }
+        }
+      `}</style>
+
       <defs>
-        {/* Blade — orange fire gradient */}
         <linearGradient id="cag" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stopColor="#FF8C3B" />  {/* gold-light */}
-          <stop offset="45%"  stopColor="#E8610A" />  {/* gold */}
-          <stop offset="100%" stopColor="#A84200" />  {/* gold-dark */}
+          <stop offset="0%"   stopColor="#FF8C3B" />
+          <stop offset="45%"  stopColor="#E8610A" />
+          <stop offset="100%" stopColor="#A84200" />
         </linearGradient>
-        {/* Lens glass — deep ember core */}
         <radialGradient id="clg" cx="42%" cy="36%" r="56%">
           <stop offset="0%"   stopColor="#1e0a04" />
           <stop offset="45%"  stopColor="#0d0608" />
           <stop offset="100%" stopColor="#060608" />
         </radialGradient>
-        {/* Outer ember haze */}
         <radialGradient id="ehaze" cx="50%" cy="50%" r="50%">
           <stop offset="0%"   stopColor="#E8610A" stopOpacity="0.18" />
           <stop offset="100%" stopColor="#E8610A" stopOpacity="0"    />
         </radialGradient>
-        {/* Soft glow filter */}
         <filter id="csg" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="5" result="b" />
           <feComposite in="SourceGraphic" in2="b" operator="over" />
         </filter>
-        {/* Blade glow */}
-        <filter id="cbg" x="-10%" y="-30%" width="120%" height="160%">
+        {/* Blade glow — applied ONCE to the whole rotating group now */}
+        <filter id="cbg" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="2.5" result="b" />
           <feComposite in="SourceGraphic" in2="b" operator="over" />
         </filter>
       </defs>
 
-      {/* Ember haze behind the whole lens */}
       <circle cx="200" cy="200" r="196" fill="url(#ehaze)" />
-
-      {/* Outer ambient glow ring */}
       <circle cx="200" cy="200" r="196" fill="none"
         stroke="#E8610A" strokeWidth="6" opacity="0.09" filter="url(#csg)" />
-
-      {/* Outer decorative rings */}
       <circle cx="200" cy="200" r="193" fill="none" stroke="#E8610A" strokeWidth="1.2" opacity="0.45" />
       <circle cx="200" cy="200" r="185" fill="none" stroke="#FF8C3B" strokeWidth="0.5" opacity="0.18" />
 
-      {/* Tick marks — lens barrel */}
       {Array.from({ length: 72 }, (_, i) => {
         const a   = (i / 72) * Math.PI * 2;
         const maj = i % 9 === 0;
@@ -127,44 +116,32 @@ function CameraAperture() {
         );
       })}
 
-      {/* ── Rotating blade group ── */}
-      <g ref={bladeRef}>
+      {/* ── Rotating blade group — CSS-driven, filter applied once ── */}
+      <g className="cam-blade-group" filter="url(#cbg)">
         {Array.from({ length: 8 }, (_, i) => (
           <g key={i} transform={`rotate(${i * 45},200,200)`}>
-            <ellipse cx="308" cy="200" rx="56" ry="20"
-              fill="url(#cag)" opacity="0.95" filter="url(#cbg)" />
-            {/* Hot leading edge */}
+            <ellipse cx="308" cy="200" rx="56" ry="20" fill="url(#cag)" opacity="0.95" />
             <ellipse cx="308" cy="197" rx="52" ry="8"
               fill="none" stroke="#FF8C3B" strokeWidth="0.7" opacity="0.3" />
-            {/* Cool trailing shadow */}
             <ellipse cx="308" cy="204" rx="50" ry="7"
               fill="none" stroke="#3d1200" strokeWidth="0.5" opacity="0.22" />
           </g>
         ))}
       </g>
 
-      {/* Inner aperture ring */}
       <circle cx="200" cy="200" r="66" fill="none"
         stroke="#E8610A" strokeWidth="4" opacity="0.95" filter="url(#csg)" />
       <circle cx="200" cy="200" r="58" fill="none"
         stroke="#FF8C3B" strokeWidth="0.9" opacity="0.55" />
-
-      {/* Lens body */}
       <circle cx="200" cy="200" r="56" fill="url(#clg)" />
-
-      {/* Lens coating rings — warm chromatic aberration */}
       <circle cx="200" cy="200" r="56" fill="none" stroke="#E8610A" strokeWidth="1.8" opacity="0.20" />
       <circle cx="200" cy="200" r="48" fill="none" stroke="#FF8C3B" strokeWidth="0.8" opacity="0.11" />
       <circle cx="200" cy="200" r="38" fill="none" stroke="#A84200" strokeWidth="0.5" opacity="0.10" />
-
-      {/* Lens reflections */}
       <ellipse cx="183" cy="182" rx="16" ry="9"  fill="white" opacity="0.04"
         transform="rotate(-28,183,182)" />
       <circle  cx="217" cy="220" r="5"            fill="white" opacity="0.025" />
       <ellipse cx="200" cy="200" rx="22" ry="6"   fill="none"
         stroke="white" strokeWidth="0.5" opacity="0.05" />
-
-      {/* Faint ember inner glow */}
       <circle cx="200" cy="200" r="56"
         fill="none" stroke="#E8610A" strokeWidth="12" opacity="0.06" />
     </svg>
