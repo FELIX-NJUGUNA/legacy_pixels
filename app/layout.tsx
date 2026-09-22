@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import CustomCursor from "@/components/ui/CustomCursor";
+
 import SmoothScroll from "@/components/ui/SmoothScroll";
 
 export const metadata: Metadata = {
@@ -28,8 +28,7 @@ export default function RootLayout({
         {/* Film grain overlay */}
         <div className="grain-overlay" aria-hidden="true" />
 
-        {/* Custom cursor */}
-        <CustomCursor />
+
 
         {/* Smooth scroll wrapper */}
         <SmoothScroll>

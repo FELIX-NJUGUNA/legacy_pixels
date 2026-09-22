@@ -43,7 +43,7 @@ export const projects: Project[] = [
     category: "Weddings",
     year: "2024",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1783668867/LEGACY_1093_rdeyes.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103193/LEGACY_14245_nwhcvr.jpg",
     aspect: "landscape",
     tags: ["Naivasha", "Film"],
   },
@@ -93,7 +93,7 @@ export const projects: Project[] = [
     category: "Weddings",
     year: "2023",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1783668867/LEGACY_1149_lqonyx.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103203/LEGACY_14224_hvcnxe.jpg",
     aspect: "portrait",
     tags: ["Intimate", "Documentary"],
   },
