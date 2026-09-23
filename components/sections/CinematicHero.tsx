@@ -10,8 +10,8 @@ const STRIP_A = [
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1637_svyzui.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904289/LEGACY_5156_rym17y.jpg",
 
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103198/LEGACY_14234_ylliqv.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103195/LEGACY_14241_lhgzwv.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103235/LEGACY_14160_y0ae91.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103231/LEGACY_14172_iomskr.jpg",
 
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669501/LEGACY_4700_zpfrxv.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669502/LEGACY_6145_hb9ykv.jpg"
@@ -20,8 +20,8 @@ const STRIP_B = [
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1681_br4ibp.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904290/LEGACY_2858_exohkc.jpg",
 
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103194/LEGACY_14244_w7ugn5.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103189/LEGACY_14252_rvtmxu.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103227/LEGACY_14179_ji9yue.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103222/LEGACY_14190_evhyad.jpg",
 
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669503/LEGACY_5896_rewno4.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669500/LEGACY_1233_twnx9m.jpg"

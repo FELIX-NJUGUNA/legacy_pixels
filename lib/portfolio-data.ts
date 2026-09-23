@@ -31,7 +31,7 @@ export const projects: Project[] = [
     id: "01",
     title: "Golden Hour Reverie",
     category: "Street Photography",
-    year: "2024",
+    year: "2026",
     image:
       "https://res.cloudinary.com/drf22orgz/image/upload/v1783676878/LEGACY_4700_y2bcyl.jpg",
     aspect: "portrait",
@@ -41,9 +41,9 @@ export const projects: Project[] = [
     id: "02",
     title: "Vows at the Rift",
     category: "Weddings",
-    year: "2024",
+    year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103193/LEGACY_14245_nwhcvr.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103217/LEGACY_14201_mxzn6p.jpg",
     aspect: "landscape",
     tags: ["Naivasha", "Film"],
   },
@@ -51,7 +51,7 @@ export const projects: Project[] = [
     id: "03",
     title: "Craft & Obsession",
     category: "Graduation",
-    year: "2024",
+    year: "2026",
     image:
       "https://res.cloudinary.com/drf22orgz/image/upload/v1783676888/LEGACY_9413_w2vlln.jpg",
     aspect: "square",
@@ -61,7 +61,7 @@ export const projects: Project[] = [
     id: "04",
     title: "Dust & Velocity",
     category: "Creative Works",
-    year: "2023",
+    year: "2026",
     image:
       "https://res.cloudinary.com/drf22orgz/image/upload/v1783676891/LEGACY_2722_k4i4al.jpg",
     aspect: "landscape",
@@ -71,7 +71,7 @@ export const projects: Project[] = [
     id: "05",
     title: "Bloom Narrative",
     category: "Picnics",
-    year: "2023",
+    year: "2026",
     image:
       "https://res.cloudinary.com/drf22orgz/image/upload/v1783676862/LEGACY_0995_osolx4.jpg",
     aspect: "portrait",
@@ -81,7 +81,7 @@ export const projects: Project[] = [
     id: "06",
     title: "Infinite Horizons",
     category: "Studio Works",
-    year: "2023",
+    year: "2026",
     image:
       "https://res.cloudinary.com/drf22orgz/image/upload/v1783676897/LEGACY_2858_tpfehk.jpg",
     aspect: "landscape",
@@ -91,9 +91,9 @@ export const projects: Project[] = [
     id: "07",
     title: "Sacred Silence",
     category: "Weddings",
-    year: "2023",
+    year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103203/LEGACY_14224_hvcnxe.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103222/LEGACY_14191_wgbkxf.jpg",
     aspect: "portrait",
     tags: ["Intimate", "Documentary"],
   },
