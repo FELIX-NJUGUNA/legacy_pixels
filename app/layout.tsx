@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-
-import SmoothScroll from "@/components/ui/SmoothScroll";
 
 export const metadata: Metadata = {
   title: "Legacy Pixels — Photography & Videography",
@@ -19,23 +15,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-void text-silk antialiased">
-        {/* Film grain overlay */}
         <div className="grain-overlay" aria-hidden="true" />
-
-
-
-        {/* Smooth scroll wrapper */}
-        <SmoothScroll>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </SmoothScroll>
+        {children}
       </body>
     </html>
   );
