@@ -5,11 +5,13 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { projects, type Category } from "@/lib/portfolio-data";
 
-const categories: Category[] = ["All", "Street Photography", "Weddings", "Graduation", "Creative Works", "Picnics", "Studio Works"];
+const categories: Category[] = [
+  "All",
+  ...Array.from(new Set(projects.map((p) => p.category))),
+];
 
 export default function Portfolio() {
   const [active, setActive] = useState<Category>("All");
-  const [hovered, setHovered] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
   const filtered =
@@ -44,16 +46,17 @@ export default function Portfolio() {
           </h2>
         </div>
 
-        {/* Filter tabs */}
+        {/* Filter tabs — a handful of categories, not the full set */}
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActive(cat)}
-              className={`label-text text-[0.65rem] px-5 py-2 border transition-all duration-300 ${active === cat
+              className={`label-text text-[0.65rem] px-5 py-2 border transition-all duration-300 ${
+                active === cat
                   ? "border-gold bg-gold !text-void"
                   : "border-white/10 text-mist hover:border-gold/50 hover:text-gold"
-                }`}
+              }`}
             >
               {cat}
             </button>
@@ -61,7 +64,7 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* Grid → Masonry */}
+      {/* Masonry grid — flows freely, no capped count */}
       <motion.div
         layout
         className="columns-1 md:columns-2 lg:columns-3 gap-4 [column-fill:_balance]"
@@ -74,10 +77,8 @@ export default function Portfolio() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4, delay: i * 0.06 }}
+              transition={{ duration: 0.4, delay: (i % 12) * 0.06 }}
               className="portfolio-item group mb-4 break-inside-avoid"
-              onMouseEnter={() => setHovered(project.id)}
-              onMouseLeave={() => setHovered(null)}
             >
               <div className="relative overflow-hidden bg-graphite">
                 <Image

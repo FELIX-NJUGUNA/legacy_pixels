@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import Portfolio from "@/components/sections/Portfolio";
+import FullPortfolio from "@/components/sections/FullPortfolio";
 
 export const metadata: Metadata = {
   title: "Portfolio — Legacy Pixels",
-  description: "Browse the full portfolio of Legacy Pixels — editorial photography, wedding films, commercial work, and documentary projects.",
+  description:
+    "Browse the full portfolio of Legacy Pixels — editorial photography, wedding films, commercial work, and documentary projects.",
 };
 
 export default function PortfolioPage() {
@@ -15,7 +16,7 @@ export default function PortfolioPage() {
           Full Portfolio
         </h1>
       </div>
-      <Portfolio />
+      <FullPortfolio />
     </div>
   );
 }

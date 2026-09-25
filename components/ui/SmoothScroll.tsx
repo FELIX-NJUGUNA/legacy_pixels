@@ -1,3 +1,4 @@
+// components/ui/SmoothScroll.tsx
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -24,7 +25,13 @@ export default function SmoothScroll({
     }
     requestAnimationFrame(raf);
 
-    return () => lenis.destroy();
+    const handleLoad = () => lenis.resize();
+    window.addEventListener("load", handleLoad);
+
+    return () => {
+      lenis.destroy();
+      window.removeEventListener("load", handleLoad);
+    };
   }, []);
 
   return <>{children}</>;

@@ -30,25 +30,38 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: 0.2 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-            ? "bg-void/80 backdrop-blur-md border-b border-white/5"
-            : "bg-transparent"
+          ? "bg-void/80 backdrop-blur-md border-b border-white/5"
+          : "bg-transparent"
           }`}
       >
         <nav className="max-w-screen-xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex flex-col leading-none group">
-            <span
-              className="display-text text-2xl text-silk group-hover:text-gold transition-colors duration-300"
-              style={{ fontFamily: "var(--font-display)", fontStyle: "italic" }}
-            >
-              Legacy
-            </span>
-            <span
-              className="label-text text-[0.55rem] tracking-[0.35em]"
-              style={{ color: "var(--gold)" }}
-            >
-              Pixels Studio
-            </span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <img
+              src="/icon.png"
+              alt="Legacy Pixels Studio"
+              className="w-10 h-10 object-contain"
+            />
+            <div className="flex flex-col leading-none">
+              <span
+                className="display-text text-2xl text-silk group-hover:text-gold transition-colors duration-300"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontStyle: "italic",
+                }}
+              >
+                Legacy
+              </span>
+
+              <span
+                className="label-text text-[0.55rem] tracking-[0.35em]"
+                style={{ color: "var(--gold)" }}
+              >
+                Pixels Studio
+              </span>
+            </div>
+
+
           </Link>
 
           {/* Desktop links */}

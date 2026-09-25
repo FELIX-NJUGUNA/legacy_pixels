@@ -163,7 +163,12 @@ const ImageStrip = memo(function ImageStrip({
 
 /* ══════════════════════════════════════════
    MAIN — CINEMATIC HERO
+   NOTE: total scroll-track height controls how much the visitor
+   has to scroll before this section releases. Tuned down from
+   520vh → 240vh so it feels responsive instead of endless.
 ══════════════════════════════════════════ */
+const SCROLL_TRACK_VH = 240; // was 520 — lower = faster to scroll through
+
 export default function CinematicHero() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [prog, setProg] = useState(0);
@@ -194,7 +199,9 @@ export default function CinematicHero() {
   // lens fades OUT over the same window, so there's always something visible
   const lensOpacity = 1 - stripOpacity;
 
-  const exitBlack = prog < 0.90 ? 0 : (prog - 0.90) / 0.10;
+  // exit-to-black starts a touch earlier and finishes faster, so the
+  // handoff to the next section on the page feels crisp, not dragged out
+  const exitBlack = prog < 0.87 ? 0 : (prog - 0.87) / 0.08;
   const ph = PHASES[phase];
 
   return (
@@ -220,7 +227,7 @@ export default function CinematicHero() {
         }
       `}</style>
 
-      <div ref={wrapRef} style={{ height: "520vh", position: "relative" }}>
+      <div ref={wrapRef} style={{ height: `${SCROLL_TRACK_VH}vh`, position: "relative" }}>
         <div
           style={{
             position: "sticky", top: 0, height: "100vh", overflow: "hidden",
