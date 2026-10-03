@@ -43,7 +43,7 @@ export const projects: Project[] = [
     category: "Weddings",
     year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103217/LEGACY_14201_mxzn6p.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103228/LEGACY_14178_r8qndr.jpg",
     aspect: "landscape",
     tags: ["Naivasha", "Film"],
   },
@@ -93,7 +93,7 @@ export const projects: Project[] = [
     category: "Weddings",
     year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103222/LEGACY_14191_wgbkxf.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103227/LEGACY_14179_ji9yue.jpg",
     aspect: "portrait",
     tags: ["Intimate", "Documentary"],
   },
@@ -148,6 +148,37 @@ export const projects: Project[] = [
       "https://res.cloudinary.com/drf22orgz/image/upload/v1783676887/LEGACY_9803_b4dzmt.jpg",
     aspect: "landscape",
     tags: ["Chilling", "Vybes"],
+  },
+
+    {
+    id: "13",
+    title: "Hands & Hearts",
+    category: "Weddings",
+    year: "2026",
+    image:
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103227/LEGACY_14180_di3nw6.jpg",
+    aspect: "portrait",
+    tags: ["Ceremony", "Film"],
+  },
+  {
+    id: "14",
+    title: "The First Dance",
+    category: "Weddings",
+    year: "2026",
+    image:
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103225/LEGACY_14182_gt8oxk.jpg",
+    aspect: "landscape",
+    tags: ["Reception", "Candid"],
+  },
+  {
+    id: "15",
+    title: "Forever Begins",
+    category: "Weddings",
+    year: "2026",
+    image:
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103224/LEGACY_14184_oafugx.jpg",
+    aspect: "portrait",
+    tags: ["Portraits", "Golden Hour"],
   },
 
 

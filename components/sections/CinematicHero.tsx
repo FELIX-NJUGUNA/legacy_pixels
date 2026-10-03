@@ -21,7 +21,7 @@ const STRIP_B = [
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904290/LEGACY_2858_exohkc.jpg",
 
   "https://res.cloudinary.com/drf22orgz/image/upload/v1790103227/LEGACY_14179_ji9yue.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103222/LEGACY_14190_evhyad.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103225/LEGACY_14182_gt8oxk.jpg",
 
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669503/LEGACY_5896_rewno4.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669500/LEGACY_1233_twnx9m.jpg"
