@@ -43,9 +43,9 @@ export const projects: Project[] = [
     category: "Weddings",
     year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103228/LEGACY_14178_r8qndr.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1794159445/LEGACY_13742_-_Copy_wfkpn9.jpg",
     aspect: "landscape",
-    tags: ["Naivasha", "Film"],
+    tags: ["Nairobi", "Film"],
   },
   {
     id: "03",
@@ -93,7 +93,7 @@ export const projects: Project[] = [
     category: "Weddings",
     year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103227/LEGACY_14179_ji9yue.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1794159454/LEGACY_13733_-_Copy_niu7fq.jpg",
     aspect: "portrait",
     tags: ["Intimate", "Documentary"],
   },
@@ -107,7 +107,7 @@ export const projects: Project[] = [
     aspect: "landscape",
     tags: ["Documentary", "Award"],
   },
-    {
+  {
     id: "09",
     title: "Blissful Embrace",
     category: "Street Photography",
@@ -117,7 +117,7 @@ export const projects: Project[] = [
     aspect: "landscape",
     tags: ["Silhoutte", "Award"],
   },
-    {
+  {
     id: "10",
     title: "Serenity",
     category: "Picnics",
@@ -139,7 +139,7 @@ export const projects: Project[] = [
     tags: ["Chilling", "Vybes"],
   },
 
-    {
+  {
     id: "12",
     title: "Serenity",
     category: "Graduation",
@@ -150,13 +150,13 @@ export const projects: Project[] = [
     tags: ["Chilling", "Vybes"],
   },
 
-    {
+  {
     id: "13",
     title: "Hands & Hearts",
     category: "Weddings",
     year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103227/LEGACY_14180_di3nw6.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1794159533/LEGACY_13298_-_Copy_gnwaar.jpg",
     aspect: "portrait",
     tags: ["Ceremony", "Film"],
   },
@@ -166,7 +166,7 @@ export const projects: Project[] = [
     category: "Weddings",
     year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103225/LEGACY_14182_gt8oxk.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1794159443/LEGACY_13745_-_Copy_tfrri0.jpg",
     aspect: "landscape",
     tags: ["Reception", "Candid"],
   },
@@ -176,7 +176,7 @@ export const projects: Project[] = [
     category: "Weddings",
     year: "2026",
     image:
-      "https://res.cloudinary.com/drf22orgz/image/upload/v1790103224/LEGACY_14184_oafugx.jpg",
+      "https://res.cloudinary.com/drf22orgz/image/upload/v1794159512/LEGACY_13723_-_Copy_skcldf.jpg",
     aspect: "portrait",
     tags: ["Portraits", "Golden Hour"],
   },

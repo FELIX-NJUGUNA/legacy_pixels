@@ -10,8 +10,9 @@ const STRIP_A = [
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1637_svyzui.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904289/LEGACY_5156_rym17y.jpg",
 
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103235/LEGACY_14160_y0ae91.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103231/LEGACY_14172_iomskr.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159523/LEGACY_13719_-_Copy_nmh1of.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159456/LEGACY_13731_-_Copy_qmejox.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159455/LEGACY_13732_-_Copy_buotrq.jpg",
 
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669501/LEGACY_4700_zpfrxv.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669502/LEGACY_6145_hb9ykv.jpg"
@@ -20,8 +21,9 @@ const STRIP_B = [
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1681_br4ibp.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1779904290/LEGACY_2858_exohkc.jpg",
 
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103227/LEGACY_14179_ji9yue.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1790103225/LEGACY_14182_gt8oxk.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159512/LEGACY_13723_-_Copy_skcldf.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159440/LEGACY_13747_jwjhtj.jpg",
+  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159521/LEGACY_13721_-_Copy_nwmlqq.jpg",
 
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669503/LEGACY_5896_rewno4.jpg",
   "https://res.cloudinary.com/drf22orgz/image/upload/v1783669500/LEGACY_1233_twnx9m.jpg"
