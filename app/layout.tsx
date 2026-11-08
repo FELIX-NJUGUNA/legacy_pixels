@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     description: "Visual storytelling through the lens.",
     type: "website",
   },
+  verification: {
+    google: "nEp296RfDSsxZqQwSKU5pyqJwKykLnw7jglGmBMdBfg",
+  },
 };
 
 export default function RootLayout({
