@@ -1,4 +1,5 @@
 import { createAdminSupabase } from "@/lib/supabase/server";
+import AdminHeader from "@/components/admin/AdminHeader";
 import CategoryManager from "@/components/admin/CategoryManager";
 
 export const dynamic = "force-dynamic";
@@ -12,9 +13,7 @@ export default async function CategoriesPage() {
 
   return (
     <div className="min-h-screen bg-[#060608] text-[#f5f0ea] px-6 md:px-12 py-12">
-      <h1 className="text-2xl mb-8" style={{ fontFamily: "Georgia, serif" }}>
-        Categories
-      </h1>
+      <AdminHeader title="Categories" />
       <CategoryManager initial={categories ?? []} />
     </div>
   );

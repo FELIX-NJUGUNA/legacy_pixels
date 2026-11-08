@@ -2,74 +2,131 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { adminFetch } from "./../../lib/admin-api";
 
 type Category = { id: string; name: string; slug: string };
 
+const input =
+  "bg-transparent border border-white/20 px-3 py-2 text-sm outline-none focus:border-[#E8610A]";
+const btn =
+  "border border-white/20 text-mist px-3 py-2 text-[11px] uppercase tracking-widest hover:border-white/50 transition-colors disabled:opacity-40";
+
 export default function CategoryManager({ initial }: { initial: Category[] }) {
   const router = useRouter();
+  const [cats, setCats] = useState(initial);
   const [name, setName] = useState("");
-  const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function addCategory(e: React.FormEvent) {
+  const errText = (e: unknown) => (e instanceof Error ? e.message : "Something went wrong");
+
+  async function add(e: React.FormEvent) {
     e.preventDefault();
-    setSaving(true);
+    if (!name.trim()) return;
+    setBusy(true);
     setError(null);
-    const res = await fetch("/api/admin/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-    setSaving(false);
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      setError(body.error ?? "Failed to add category.");
-      return;
+    try {
+      const created = await adminFetch<Category>("/api/admin/categories", "POST", { name });
+      setCats((prev) => [...prev, created]);
+      setName("");
+      router.refresh();
+    } catch (err) {
+      setError(errText(err));
+    } finally {
+      setBusy(false);
     }
-    setName("");
-    router.refresh();
   }
 
-  async function deleteCategory(id: string) {
-    if (!confirm("Delete this category? Projects in it become uncategorized.")) return;
-    const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
-    if (res.ok) router.refresh();
-    else alert("Failed to delete category.");
+  async function rename(id: string) {
+    if (!editName.trim()) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const updated = await adminFetch<Category>(`/api/admin/categories/${id}`, "PUT", { name: editName });
+      setCats((prev) => prev.map((c) => (c.id === id ? updated : c)));
+      setEditingId(null);
+      router.refresh();
+    } catch (err) {
+      setError(errText(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove(c: Category) {
+    if (!window.confirm(`Delete "${c.name}"? Its items will become Uncategorized (they are not deleted).`)) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await adminFetch(`/api/admin/categories/${c.id}`, "DELETE");
+      setCats((prev) => prev.filter((x) => x.id !== c.id));
+      router.refresh();
+    } catch (err) {
+      setError(errText(err));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <div className="max-w-md space-y-8">
-      <form onSubmit={addCategory} className="flex gap-3">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="New category name"
-          required
-          className="flex-1 bg-transparent border border-white/20 px-4 py-3 text-sm focus:border-[#E8610A] outline-none"
-        />
+    <div className="max-w-xl space-y-6">
+      <form onSubmit={add} className="flex gap-3">
+        <input className={`${input} flex-1`} placeholder="New category name" value={name} onChange={(e) => setName(e.target.value)} />
         <button
           type="submit"
-          disabled={saving}
+          disabled={busy || !name.trim()}
           className="border border-[#E8610A] text-[#E8610A] px-5 py-2 text-xs uppercase tracking-widest hover:bg-[#E8610A] hover:text-[#060608] transition-colors disabled:opacity-50"
         >
           Add
         </button>
       </form>
+
       {error && <p className="text-red-400 text-sm">{error}</p>}
 
-      <div className="space-y-2">
-        {initial.map((c) => (
-          <div key={c.id} className="flex items-center justify-between border border-white/10 px-4 py-3">
-            <span className="text-sm">{c.name}</span>
-            <button
-              onClick={() => deleteCategory(c.id)}
-              className="text-xs uppercase tracking-widest text-mist hover:text-red-400"
-            >
-              Delete
-            </button>
-          </div>
+      <ul className="divide-y divide-white/10 border border-white/10">
+        {cats.map((c) => (
+          <li key={c.id} className="flex items-center gap-3 p-3">
+            {editingId === c.id ? (
+              <>
+                <input
+                  autoFocus
+                  className={`${input} flex-1`}
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") rename(c.id);
+                    if (e.key === "Escape") setEditingId(null);
+                  }}
+                />
+                <button className={btn} disabled={busy} onClick={() => rename(c.id)}>Save</button>
+                <button className={btn} onClick={() => setEditingId(null)}>Cancel</button>
+              </>
+            ) : (
+              <>
+                <div className="flex-1">
+                  <p className="text-sm">{c.name}</p>
+                  <p className="text-[11px] text-mist/40">/{c.slug}</p>
+                </div>
+                <button
+                  className={btn}
+                  onClick={() => {
+                    setEditingId(c.id);
+                    setEditName(c.name);
+                  }}
+                >
+                  Rename
+                </button>
+                <button className={`${btn} !border-red-400/40 !text-red-400`} disabled={busy} onClick={() => remove(c)}>
+                  Delete
+                </button>
+              </>
+            )}
+          </li>
         ))}
-      </div>
+        {cats.length === 0 && <li className="p-4 text-sm text-mist/50">No categories yet.</li>}
+      </ul>
     </div>
   );
 }

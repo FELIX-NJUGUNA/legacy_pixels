@@ -2,37 +2,7 @@
 
 import { useEffect, useRef, useState, memo } from "react";
 import Link from "next/link";
-
-/* ══════════════════════════════════════════
-   IMAGE CATALOG — your portfolio strip (phase 2)
-══════════════════════════════════════════ */
-const STRIP_A = [
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1637_svyzui.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1779904289/LEGACY_5156_rym17y.jpg",
-
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159523/LEGACY_13719_-_Copy_nmh1of.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159456/LEGACY_13731_-_Copy_qmejox.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159455/LEGACY_13732_-_Copy_buotrq.jpg",
-
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1783669501/LEGACY_4700_zpfrxv.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1783669502/LEGACY_6145_hb9ykv.jpg"
-];
-const STRIP_B = [
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1779904292/LEGACY_1681_br4ibp.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1779904290/LEGACY_2858_exohkc.jpg",
-
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159512/LEGACY_13723_-_Copy_skcldf.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159440/LEGACY_13747_jwjhtj.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1794159521/LEGACY_13721_-_Copy_nwmlqq.jpg",
-
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1783669503/LEGACY_5896_rewno4.jpg",
-  "https://res.cloudinary.com/drf22orgz/image/upload/v1783669500/LEGACY_1233_twnx9m.jpg"
-];
-
-/* Placeholder — swap for a licensed camera-lens shot you own.
-   Unsplash's free license permits this direct hotlink. */
-const LENS_IMAGE =
-  "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1600&q=60";
+import { DEFAULT_HERO, type HeroConfig } from "@/lib/hero-defaults";
 
 /* ══════════════════════════════════════════
    CLOUDINARY TRANSFORM HELPER
@@ -43,27 +13,6 @@ function cld(url: string, width = 700) {
     `/upload/f_auto,q_auto,dpr_auto,c_fill,w_${width}/`
   );
 }
-
-/* ══════════════════════════════════════════
-   PHASE COPY
-══════════════════════════════════════════ */
-const PHASES = [
-  {
-    tag: "Photography & Videography Studio",
-    lines: ["Moments", "Forged in", "Light."],
-    sub: "Legacy Pixels — where every frame is composed with intent, and every film is cut to endure.",
-  },
-  {
-    tag: "Step Inside",
-    lines: ["Enter the", "Frame."],
-    sub: "Every zoom. Every click. Every breath held before the shutter falls.",
-  },
-  {
-    tag: "The Portfolio",
-    lines: ["320+", "Stories", "Captured."],
-    sub: "Weddings. Landscapes. Life itself in motion.",
-  },
-];
 
 function useAspectRatios(images: string[]) {
   const [ratios, setRatios] = useState<Record<string, number>>({});
@@ -103,10 +52,9 @@ function usePreconnect() {
 }
 
 /* ══════════════════════════════════════════
-   LENS BACKGROUND — cheap CSS-only zoom,
-   fills phases 0–1 so nothing is blank
+   LENS BACKGROUND
 ══════════════════════════════════════════ */
-const LensBackground = memo(function LensBackground({ opacity }: { opacity: number }) {
+const LensBackground = memo(function LensBackground({ src, opacity }: { src: string; opacity: number }) {
   return (
     <div
       style={{
@@ -116,7 +64,7 @@ const LensBackground = memo(function LensBackground({ opacity }: { opacity: numb
       }}
     >
       <img
-        src={LENS_IMAGE}
+        src={src.includes("res.cloudinary.com") ? cld(src, 1600) : src}
         alt=""
         fetchPriority="high"
         decoding="async"
@@ -165,13 +113,14 @@ const ImageStrip = memo(function ImageStrip({
 
 /* ══════════════════════════════════════════
    MAIN — CINEMATIC HERO
-   NOTE: total scroll-track height controls how much the visitor
-   has to scroll before this section releases. Tuned down from
-   520vh → 240vh so it feels responsive instead of endless.
+   Content now comes from the admin (Hero page). With no `config`
+   prop it falls back to the original built-in content.
 ══════════════════════════════════════════ */
-const SCROLL_TRACK_VH = 240; // was 520 — lower = faster to scroll through
+const SCROLL_TRACK_VH = 240;
 
-export default function CinematicHero() {
+export default function CinematicHero({ config = DEFAULT_HERO }: { config?: HeroConfig }) {
+  const { lens_image, strip_a, strip_b, phases: PHASES, stats } = config;
+
   const wrapRef = useRef<HTMLDivElement>(null);
   const [prog, setProg] = useState(0);
   usePreconnect();
@@ -195,14 +144,8 @@ export default function CinematicHero() {
   }, []);
 
   const phase = prog < 0.28 ? 0 : prog < 0.64 ? 1 : 2;
-
-  // strips fade IN as we approach phase 2
   const stripOpacity = prog < 0.58 ? 0 : prog < 0.74 ? (prog - 0.58) / 0.16 : 1;
-  // lens fades OUT over the same window, so there's always something visible
   const lensOpacity = 1 - stripOpacity;
-
-  // exit-to-black starts a touch earlier and finishes faster, so the
-  // handoff to the next section on the page feels crisp, not dragged out
   const exitBlack = prog < 0.87 ? 0 : (prog - 0.87) / 0.08;
   const ph = PHASES[phase];
 
@@ -242,16 +185,14 @@ export default function CinematicHero() {
             background: "radial-gradient(ellipse at 64% 46%, #130a0c 0%, #060608 68%)",
           }} />
 
-          {/* Camera-lens backdrop — covers phases 0–1, no more blank space */}
-          <LensBackground opacity={lensOpacity} />
+          <LensBackground src={lens_image} opacity={lensOpacity} />
 
-          {/* Portfolio strips — fades in for phase 2 */}
           <div style={{
             position: "absolute", inset: 0, display: "flex", gap: "5px",
             opacity: stripOpacity, zIndex: 1,
           }}>
-            <ImageStrip images={STRIP_A} direction="up" speed={24} />
-            <ImageStrip images={STRIP_B} direction="down" speed={30} />
+            <ImageStrip images={strip_a} direction="up" speed={24} />
+            <ImageStrip images={strip_b} direction="down" speed={30} />
           </div>
 
           <div style={{
@@ -359,7 +300,7 @@ export default function CinematicHero() {
                 animation: "ch-fade 0.7s ease both",
               }}
             >
-              {([["320+", "Projects"], ["8", "Years"], ["12", "Awards"]] as const).map(([n, l]) => (
+              {stats.map(({ n, l }) => (
                 <div key={l}>
                   <div style={{
                     fontSize: "clamp(1.5rem, 2.5vw, 2rem)",

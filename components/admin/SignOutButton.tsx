@@ -5,16 +5,20 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function SignOutButton() {
   const router = useRouter();
-  const supabase = createClient();
+
+  async function signOut() {
+    try {
+      await createClient().auth.signOut();
+    } finally {
+      router.replace("/admin/login");
+      router.refresh();
+    }
+  }
 
   return (
     <button
-      onClick={async () => {
-        await supabase.auth.signOut();
-        router.push("/admin/login");
-        router.refresh();
-      }}
-      className="text-xs uppercase tracking-widest text-mist hover:text-[#E8610A]"
+      onClick={signOut}
+      className="text-xs uppercase tracking-widest text-mist hover:text-[#E8610A] transition-colors"
     >
       Sign out
     </button>
