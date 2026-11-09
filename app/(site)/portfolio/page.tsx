@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import FullPortfolio from "@/components/sections/FullPortfolio";
+import PortfolioSection from "@/components/sections/PortfolioSection";
 
 export const metadata: Metadata = {
   title: "Portfolio — Legacy Pixels",
@@ -16,7 +17,7 @@ export default function PortfolioPage() {
           Full Portfolio
         </h1>
       </div>
-      <FullPortfolio />
+      <PortfolioSection variant="full" />
     </div>
   );
 }

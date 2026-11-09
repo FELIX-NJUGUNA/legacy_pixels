@@ -17,17 +17,18 @@ export type PortfolioProject = {
 export default function Portfolio({
   projects,
   categories: categoryNames,
+  variant = "home",
 }: {
   projects: PortfolioProject[];
   categories: string[];
+  variant?: "home" | "full";
 }) {
+  const full = variant === "full";
   const categories = ["All", ...categoryNames];
   const [active, setActive] = useState<string>("All");
   const sectionRef = useRef<HTMLElement>(null);
 
-  // if the active category disappears (e.g. after an admin change), reset
   const safeActive = categories.includes(active) ? active : "All";
-
   const filtered =
     safeActive === "All" ? projects : projects.filter((p) => p.category === safeActive);
 
@@ -40,47 +41,65 @@ export default function Portfolio({
       },
       { threshold: 0.1 }
     );
-    const reveals = sectionRef.current?.querySelectorAll(".section-reveal");
-    reveals?.forEach((el) => observer.observe(el));
+    sectionRef.current?.querySelectorAll(".section-reveal").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
+  const tabs = (
+    <div className="flex flex-wrap gap-2">
+      {categories.map((cat) => (
+        <button
+          key={cat}
+          onClick={() => setActive(cat)}
+          className={`label-text text-[0.65rem] px-5 py-2 border transition-all duration-300 ${
+            safeActive === cat
+              ? "border-gold bg-gold !text-void"
+              : "border-white/10 text-mist hover:border-gold/50 hover:text-gold"
+          }`}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <section
-      id="portfolio"
+      id={full ? undefined : "portfolio"}
       ref={sectionRef}
-      className="py-32 px-6 md:px-12 max-w-screen-xl mx-auto"
+      className={
+        full
+          ? "pb-32 px-6 md:px-12 max-w-screen-xl mx-auto"
+          : "py-32 px-6 md:px-12 max-w-screen-xl mx-auto"
+      }
     >
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 section-reveal">
-        <div>
-          <p className="label-text mb-4">Selected Work</p>
-          <h2 className="display-text text-[clamp(2.5rem,5vw,4.5rem)] text-silk leading-[0.92]">
-            The Portfolio
-          </h2>
+      {full ? (
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 section-reveal border-t border-white/10 pt-10">
+          <p className="label-text text-mist/60 text-[0.65rem]">
+            {filtered.length} {filtered.length === 1 ? "Project" : "Projects"}
+            {safeActive !== "All" && <span className="text-gold"> — {safeActive}</span>}
+          </p>
+          {tabs}
         </div>
-
-        <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActive(cat)}
-              className={`label-text text-[0.65rem] px-5 py-2 border transition-all duration-300 ${
-                safeActive === cat
-                  ? "border-gold bg-gold !text-void"
-                  : "border-white/10 text-mist hover:border-gold/50 hover:text-gold"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+      ) : (
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 section-reveal">
+          <div>
+            <p className="label-text mb-4">Selected Work</p>
+            <h2 className="display-text text-[clamp(2.5rem,5vw,4.5rem)] text-silk leading-[0.92]">
+              The Portfolio
+            </h2>
+          </div>
+          {tabs}
         </div>
-      </div>
+      )}
 
-      {/* Masonry grid */}
       <motion.div
         layout
-        className="columns-1 md:columns-2 lg:columns-3 gap-4 [column-fill:_balance]"
+        className={
+          full
+            ? "columns-1 md:columns-2 xl:columns-3 gap-4 [column-fill:_balance]"
+            : "columns-1 md:columns-2 lg:columns-3 gap-4 [column-fill:_balance]"
+        }
       >
         <AnimatePresence>
           {filtered.map((project, i) => (
@@ -99,11 +118,7 @@ export default function Portfolio({
                   alt={project.title}
                   width={800}
                   height={
-                    project.aspect === "portrait"
-                      ? 1067
-                      : project.aspect === "square"
-                        ? 800
-                        : 500
+                    project.aspect === "portrait" ? 1067 : project.aspect === "square" ? 800 : 500
                   }
                   className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.07]"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -133,7 +148,6 @@ export default function Portfolio({
                   </div>
                 </div>
 
-                {/* Item number (position, since database ids are long) */}
                 <div className="absolute top-4 right-4 label-text text-[0.65rem] text-mist/40 group-hover:text-gold transition-colors duration-300">
                   {String(i + 1).padStart(2, "0")}
                 </div>
@@ -143,15 +157,23 @@ export default function Portfolio({
         </AnimatePresence>
       </motion.div>
 
-      <div className="mt-16 text-center section-reveal">
-        <a
-          href="/portfolio"
-          className="inline-flex items-center gap-3 label-text text-mist hover:text-gold transition-colors duration-300 group"
-        >
-          View All Projects
-          <span className="inline-block w-8 h-px bg-mist group-hover:bg-gold group-hover:w-12 transition-all duration-300" />
-        </a>
-      </div>
+      {filtered.length === 0 && (
+        <div className="text-center py-24">
+          <p className="label-text text-mist/40">No projects in this category yet.</p>
+        </div>
+      )}
+
+      {!full && (
+        <div className="mt-16 text-center section-reveal">
+          <a
+            href="/portfolio"
+            className="inline-flex items-center gap-3 label-text text-mist hover:text-gold transition-colors duration-300 group"
+          >
+            View All Projects
+            <span className="inline-block w-8 h-px bg-mist group-hover:bg-gold group-hover:w-12 transition-all duration-300" />
+          </a>
+        </div>
+      )}
     </section>
   );
 }
