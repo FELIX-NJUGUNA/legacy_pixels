@@ -3,19 +3,33 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { projects, type Category } from "@/lib/portfolio-data";
 
-const categories: Category[] = [
-  "All",
-  ...Array.from(new Set(projects.map((p) => p.category))),
-];
+export type PortfolioProject = {
+  id: string;
+  title: string;
+  category: string;
+  year: string;
+  image: string;
+  aspect: "portrait" | "landscape" | "square";
+  tags: string[];
+};
 
-export default function Portfolio() {
-  const [active, setActive] = useState<Category>("All");
+export default function Portfolio({
+  projects,
+  categories: categoryNames,
+}: {
+  projects: PortfolioProject[];
+  categories: string[];
+}) {
+  const categories = ["All", ...categoryNames];
+  const [active, setActive] = useState<string>("All");
   const sectionRef = useRef<HTMLElement>(null);
 
+  // if the active category disappears (e.g. after an admin change), reset
+  const safeActive = categories.includes(active) ? active : "All";
+
   const filtered =
-    active === "All" ? projects : projects.filter((p) => p.category === active);
+    safeActive === "All" ? projects : projects.filter((p) => p.category === safeActive);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -46,14 +60,13 @@ export default function Portfolio() {
           </h2>
         </div>
 
-        {/* Filter tabs — a handful of categories, not the full set */}
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActive(cat)}
               className={`label-text text-[0.65rem] px-5 py-2 border transition-all duration-300 ${
-                active === cat
+                safeActive === cat
                   ? "border-gold bg-gold !text-void"
                   : "border-white/10 text-mist hover:border-gold/50 hover:text-gold"
               }`}
@@ -64,7 +77,7 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* Masonry grid — flows freely, no capped count */}
+      {/* Masonry grid */}
       <motion.div
         layout
         className="columns-1 md:columns-2 lg:columns-3 gap-4 [column-fill:_balance]"
@@ -96,10 +109,8 @@ export default function Portfolio() {
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
 
-                {/* Overlay */}
                 <div className="overlay absolute inset-0 bg-gradient-to-t from-void/95 via-void/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
 
-                {/* Info */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-400">
                   <p className="label-text text-[0.6rem] mb-2 text-gold">
                     {project.category} — {project.year}
@@ -122,9 +133,9 @@ export default function Portfolio() {
                   </div>
                 </div>
 
-                {/* Project number */}
+                {/* Item number (position, since database ids are long) */}
                 <div className="absolute top-4 right-4 label-text text-[0.65rem] text-mist/40 group-hover:text-gold transition-colors duration-300">
-                  {project.id}
+                  {String(i + 1).padStart(2, "0")}
                 </div>
               </div>
             </motion.article>
@@ -132,7 +143,6 @@ export default function Portfolio() {
         </AnimatePresence>
       </motion.div>
 
-      {/* View more */}
       <div className="mt-16 text-center section-reveal">
         <a
           href="/portfolio"

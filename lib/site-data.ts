@@ -1,8 +1,10 @@
 // SERVER ONLY — what the PUBLIC site reads from Supabase (with safe fallbacks).
+import { unstable_noStore as noStore } from "next/cache";
 import { createAdminSupabase } from "@/lib/supabase/server";
 import { DEFAULT_HERO, sanitizeHero, type HeroConfig } from "@/lib/hero-defaults";
 
 export async function getHeroConfig(): Promise<HeroConfig> {
+  noStore();
   try {
     const supabase = createAdminSupabase();
     const { data } = await supabase.from("site_settings").select("value").eq("key", "hero").maybeSingle();
@@ -28,6 +30,7 @@ export type PublicProject = {
  *   const projects = await getPublicProjects(staticProjects);
  */
 export async function getPublicProjects<T = PublicProject>(fallback: T[] = []): Promise<T[]> {
+  noStore();
   try {
     const supabase = createAdminSupabase();
     const { data, error } = await supabase
@@ -54,6 +57,7 @@ export async function getPublicProjects<T = PublicProject>(fallback: T[] = []): 
 
 /** Category names in admin order, for the portfolio filter bar. */
 export async function getPublicCategoryNames(fallback: string[] = []): Promise<string[]> {
+  noStore();
   try {
     const supabase = createAdminSupabase();
     const { data, error } = await supabase.from("categories").select("name").order("sort_order", { ascending: true });
