@@ -19,12 +19,12 @@ function friendlyError(message: string) {
 function EyeIcon({ off }: { off: boolean }) {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.6"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -36,10 +36,21 @@ function EyeIcon({ off }: { off: boolean }) {
   );
 }
 
+/* Crop mark, like the corners of a viewfinder or a contact sheet */
+function Corner({ className }: { className: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute h-5 w-5 border-[#E8610A]/70 ${className}`}
+    />
+  );
+}
+
 const inputClass =
-  "w-full bg-white/[0.03] border border-white/15 rounded-sm px-4 py-3 text-[15px] " +
-  "placeholder:text-white/30 outline-none transition-colors " +
-  "hover:border-white/30 focus:border-[#E8610A] focus-visible:ring-2 focus-visible:ring-[#E8610A]/40";
+  "w-full rounded-sm border border-white/15 bg-[#101014] px-4 py-3 text-[15px] text-[#f5f0ea] " +
+  "caret-[#E8610A] placeholder:text-white/25 outline-none transition-colors " +
+  "hover:border-white/30 focus:border-[#E8610A] focus-visible:ring-2 focus-visible:ring-[#E8610A]/30 " +
+  "disabled:opacity-60";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -68,8 +79,7 @@ export default function AdminLoginPage() {
       });
       if (error) {
         setError(friendlyError(error.message));
-        setPassword("");
-        return;
+        return; // keep the password so a typo is easy to fix
       }
       router.replace("/admin");
       router.refresh();
@@ -81,31 +91,46 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#060608] text-[#f5f0ea] px-6">
-      {/* Faint ember glow behind the form */}
+    <main
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#060608] px-6 text-[#f5f0ea]"
+      style={{ colorScheme: "dark" }}
+    >
+      {/* Browsers paint autofilled inputs light blue/white; keep them on theme */}
+      <style>{`
+        .login-input:-webkit-autofill,
+        .login-input:-webkit-autofill:hover,
+        .login-input:-webkit-autofill:focus {
+          -webkit-text-fill-color: #f5f0ea;
+          caret-color: #E8610A;
+          -webkit-box-shadow: 0 0 0 1000px #101014 inset;
+          box-shadow: 0 0 0 1000px #101014 inset;
+          transition: background-color 9999s ease-in-out 0s;
+        }
+      `}</style>
+
+      {/* Darkroom safelight glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.12] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-[-10%] h-[620px] w-[620px] -translate-x-1/2 rounded-full opacity-[0.14] blur-3xl"
         style={{ background: "radial-gradient(circle, #E8610A 0%, transparent 70%)" }}
       />
 
       <form
         onSubmit={handleSubmit}
-        noValidate={false}
         aria-describedby={error ? errorId : undefined}
-        className="relative w-full max-w-sm"
+        className="relative w-full max-w-md px-9 py-10"
       >
-        <div className="mb-8 border-l-2 border-[#E8610A] pl-4">
-          <h1
-            className="text-3xl leading-tight"
-            style={{ fontFamily: "Georgia, serif" }}
-          >
-            Admin sign in
-          </h1>
-          <p className="mt-1 text-sm text-white/50">
-            Use your admin account to manage the site.
-          </p>
-        </div>
+        <Corner className="left-0 top-0 border-l border-t" />
+        <Corner className="right-0 top-0 border-r border-t" />
+        <Corner className="bottom-0 left-0 border-b border-l" />
+        <Corner className="bottom-0 right-0 border-b border-r" />
+
+        <h1 className="text-3xl leading-tight" style={{ fontFamily: "Georgia, serif" }}>
+          Portfolio admin
+        </h1>
+        <p className="mt-2 mb-8 text-sm text-white/50">
+          Sign in to manage your photographs and galleries.
+        </p>
 
         <div className="space-y-5">
           <div>
@@ -124,45 +149,45 @@ export default function AdminLoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
-              className={inputClass}
+              className={`login-input ${inputClass}`}
             />
           </div>
 
           <div>
-            <label htmlFor={passwordId} className="mb-1.5 block text-sm text-white/70">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                id={passwordId}
-                type={showPassword ? "text" : "password"}
-                name="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyUp={(e) => setCapsLock(e.getModifierState("CapsLock"))}
-                onBlur={() => setCapsLock(false)}
-                required
-                disabled={loading}
-                className={`${inputClass} pr-12`}
-              />
+            <div className="mb-1.5 flex items-center justify-between">
+              <label htmlFor={passwordId} className="text-sm text-white/70">
+                Password
+              </label>
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
                 aria-pressed={showPassword}
-                className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-white/50 transition-colors hover:text-white focus-visible:text-[#E8610A] focus-visible:outline-none"
+                className="flex items-center gap-1.5 rounded-sm px-1 py-0.5 text-xs text-white/70 transition-colors hover:text-[#E8610A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8610A]/50"
               >
                 <EyeIcon off={showPassword} />
+                {showPassword ? "Hide password" : "Show password"}
               </button>
             </div>
+            <input
+              id={passwordId}
+              type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyUp={(e) => setCapsLock(e.getModifierState("CapsLock"))}
+              onBlur={() => setCapsLock(false)}
+              required
+              disabled={loading}
+              className={`login-input ${inputClass}`}
+            />
             {capsLock && (
               <p className="mt-1.5 text-xs text-amber-300/90">Caps Lock is on.</p>
             )}
           </div>
         </div>
 
-        <div id={errorId} role="alert" aria-live="polite" className="min-h-[3rem] pt-4">
+        <div id={errorId} role="alert" aria-live="polite" className="min-h-[3.5rem] pt-4">
           {error && (
             <p className="border-l-2 border-red-400 bg-red-400/10 px-3 py-2 text-sm text-red-300">
               {error}
