@@ -25,21 +25,28 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Optional lock: set ADMIN_EMAIL (comma-separated) so only you can use /admin
+  const allowed = (process.env.ADMIN_EMAIL ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  const isAdmin = !!user && (!allowed.length || allowed.includes((user.email ?? "").toLowerCase()));
+
   const path = request.nextUrl.pathname;
   const isLoginPage = path === "/admin/login";
   const isApi = path.startsWith("/api/admin");
 
-  if (!user && isApi) {
+  if (!isAdmin && isApi) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!user && !isLoginPage) {
+  if (!isAdmin && !isLoginPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && isLoginPage) {
+  if (isAdmin && isLoginPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     return NextResponse.redirect(url);

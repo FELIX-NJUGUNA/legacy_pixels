@@ -80,7 +80,7 @@ export default function Navbar() {
           {/* CTA */}
           <div className="hidden md:flex items-center gap-6">
             <Link
-              href="/contact"
+              href="/#contact"
               className="relative overflow-hidden border border-gold/40 text-gold hover:text-void transition-colors duration-400 label-text px-6 py-2.5 group"
             >
               <span className="relative z-10">Book a Session</span>
@@ -141,7 +141,7 @@ export default function Navbar() {
               className="mt-8"
             >
               <Link
-                href="/#packages"
+                href="/#contact"
                 onClick={() => setMenuOpen(false)}
                 className="border border-gold text-gold label-text px-8 py-3"
               >

@@ -37,7 +37,7 @@ export default function About() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden">
+    <section id="about" ref={sectionRef} className="relative overflow-hidden">
       {/* Marquee strip */}
       <div className="border-y border-white/5 py-5 bg-obsidian overflow-hidden">
         <div

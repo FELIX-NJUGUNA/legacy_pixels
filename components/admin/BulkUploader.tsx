@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { adminFetch } from "@/lib/admin-api";
 import {
   importFromUrl,
+  linkPreviewUrl,
   titleFromFilename,
   titleFromLink,
   uploadToCloudinary,
@@ -17,6 +18,7 @@ type Item = {
   id: string;
   file?: File;
   link?: string;
+  preview?: string;
   title: string;
   status: Status;
   progress: number;
@@ -40,6 +42,7 @@ export default function BulkUploader({ categories }: { categories: Category[] })
   const [running, setRunning] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [links, setLinks] = useState("");
+  const [expanding, setExpanding] = useState(false);
 
   function addFiles(list: FileList | File[]) {
     const accepted = Array.from(list).filter((f) => /^(image|video)\//.test(f.type));
@@ -48,6 +51,7 @@ export default function BulkUploader({ categories }: { categories: Category[] })
       ...accepted.map((file) => ({
         id: uid(),
         file,
+        preview: URL.createObjectURL(file),
         title: titleFromFilename(file.name),
         status: "queued" as Status,
         progress: 0,
@@ -55,20 +59,44 @@ export default function BulkUploader({ categories }: { categories: Category[] })
     ]);
   }
 
-  function addLinks() {
+  async function addLinks() {
     const urls = links.split(/\s+/).filter(Boolean);
     if (!urls.length) return;
+    setExpanding(true);
+    const entries: { link: string; title: string }[] = [];
+    for (const u of urls) {
+      if (/drive\.google\.com\/drive\/(u\/\d+\/)?folders\//i.test(u)) {
+        try {
+          const res = await fetch("/api/admin/drive", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: u }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error ?? "Could not read folder");
+          data.forEach((f: { name: string; link: string }) =>
+            entries.push({ link: f.link, title: titleFromFilename(f.name) })
+          );
+        } catch (e) {
+          alert(e instanceof Error ? e.message : "Could not read folder");
+        }
+      } else {
+        entries.push({ link: u, title: titleFromLink(u) });
+      }
+    }
     setItems((prev) => [
       ...prev,
-      ...urls.map((link) => ({
+      ...entries.map((e) => ({
         id: uid(),
-        link,
-        title: titleFromLink(link),
+        link: e.link,
+        preview: linkPreviewUrl(e.link),
+        title: e.title,
         status: "queued" as Status,
         progress: 0,
       })),
     ]);
     setLinks("");
+    setExpanding(false);
   }
 
   function patch(id: string, p: Partial<Item>) {
@@ -171,7 +199,7 @@ export default function BulkUploader({ categories }: { categories: Category[] })
         <textarea
           rows={3}
           className={`${input} w-full resize-y`}
-          placeholder={"Or paste links — one per line:\nGoogle Drive file links, Cloudinary links, or any direct image URL"}
+          placeholder={"Or paste links — one per line:\nGoogle Drive file or folder links, Cloudinary links, or any direct image URL"}
           value={links}
           onChange={(e) => setLinks(e.target.value)}
           disabled={running}
@@ -180,13 +208,13 @@ export default function BulkUploader({ categories }: { categories: Category[] })
           <button
             type="button"
             onClick={addLinks}
-            disabled={running || !links.trim()}
+            disabled={running || expanding || !links.trim()}
             className="border border-white/20 text-mist px-4 py-2 text-[11px] uppercase tracking-widest hover:border-white/50 transition-colors disabled:opacity-40"
           >
-            Add links to queue
+            {expanding ? "Reading…" : "Add links to queue"}
           </button>
           <p className="text-[11px] text-mist/40">
-            Drive files must be shared as &quot;Anyone with the link&quot;. Folder links aren&apos;t supported.
+            Drive files and folders must be shared as &quot;Anyone with the link&quot;. Folder links add every image/video inside.
           </p>
         </div>
       </div>
@@ -197,6 +225,17 @@ export default function BulkUploader({ categories }: { categories: Category[] })
             {items.map((i) => (
               <li key={i.id} className="p-3 space-y-2">
                 <div className="flex items-center gap-3">
+                  {i.file?.type.startsWith("video/") ? (
+                    <video src={i.preview} muted className="w-16 h-16 object-cover shrink-0 bg-white/5" />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={i.preview}
+                      alt=""
+                      loading="lazy"
+                      className="w-16 h-16 object-cover shrink-0 bg-white/5"
+                    />
+                  )}
                   <input
                     className={`${input} flex-1 min-w-0`}
                     value={i.title}
@@ -212,7 +251,10 @@ export default function BulkUploader({ categories }: { categories: Category[] })
                   </span>
                   {!running && i.status !== "done" && (
                     <button
-                      onClick={() => setItems((prev) => prev.filter((x) => x.id !== i.id))}
+                      onClick={() => {
+                        if (i.file && i.preview) URL.revokeObjectURL(i.preview);
+                        setItems((prev) => prev.filter((x) => x.id !== i.id));
+                      }}
                       className="text-mist/50 hover:text-red-400 text-lg leading-none"
                       aria-label="Remove"
                     >

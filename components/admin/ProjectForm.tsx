@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { adminFetch } from "@/lib/admin-api";
 import {
   importFromUrl,
+  linkPreviewUrl,
+  parseDriveId,
   parseCloudinaryUrl,
   thumbUrl,
   titleFromFilename,
@@ -128,7 +130,8 @@ export default function ProjectForm({
 
   const existingType = initial?.media_type;
   const linkIsCloudinary = !!link.trim() && !!parseCloudinaryUrl(link);
-  const showExisting = !file && !linkIsCloudinary && initial?.media_url;
+  const linkIsDrive = !!link.trim() && !linkIsCloudinary && !!parseDriveId(link);
+  const showExisting = !file && !linkIsCloudinary && !linkIsDrive && initial?.media_url;
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
@@ -160,12 +163,23 @@ export default function ProjectForm({
           ) : linkIsCloudinary ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={thumbUrl(link.trim(), "image", 1000)} alt="Link preview" className="mx-auto max-h-80 object-contain" />
+          ) : linkIsDrive ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={linkPreviewUrl(link, 1000)} alt="Drive preview" className="mx-auto max-h-80 object-contain" />
           ) : showExisting ? (
             existingType === "video" ? (
               <video src={initial!.media_url} controls className="mx-auto max-h-80" onClick={(e) => e.stopPropagation()} />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={thumbUrl(initial!.media_url!, "image", 1000)} alt={title} className="mx-auto max-h-80 object-contain" />
+              <img
+                src={thumbUrl(initial!.media_url!, "image", 1000)}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = initial!.media_url!;
+                }}
+                alt={title}
+                className="mx-auto max-h-80 object-contain"
+              />
             )
           ) : (
             <p className="text-sm text-mist/60 py-10">Drop an image or video here, or click to browse</p>

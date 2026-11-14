@@ -1,6 +1,6 @@
 export default function robots() {
   return {
-    rules: { userAgent: '*', allow: '/' },
+    rules: { userAgent: '*', allow: '/', disallow: ['/admin', '/api'] },
     sitemap: 'https://www.legacypixels.co.ke/sitemap.xml',
   }
 }

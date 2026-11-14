@@ -30,6 +30,10 @@ html {
   scroll-behavior: smooth;
 }
 
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
 body {
   background-color: var(--void);
   color: var(--silk);

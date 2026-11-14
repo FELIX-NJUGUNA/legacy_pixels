@@ -57,6 +57,7 @@ export function uploadToCloudinary(
     const fd = new FormData();
     fd.append("file", source);
     fd.append("upload_preset", preset);
+    fd.append("folder", "legacy-pixels/portfolio");
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloud}/auto/upload`);
@@ -171,7 +172,14 @@ export async function importFromUrl(
   }
 
   const driveId = parseDriveId(input);
-  const source = driveId ? `https://drive.google.com/uc?export=download&id=${driveId}` : input;
+  let source = input;
+  if (driveId) {
+    source = `https://drive.google.com/uc?export=download&id=${driveId}`; // fallback
+    try {
+      const r = await fetch(`/api/admin/drive/file?id=${driveId}`);
+      if (r.ok) source = (await r.json()).url;
+    } catch {}
+  }
   try {
     return await uploadToCloudinary(source, onProgress);
   } catch (e) {
@@ -182,4 +190,13 @@ export async function importFromUrl(
         : msg
     );
   }
+}
+
+/** Preview URL for a pasted link (Cloudinary, Google Drive, or any direct image). */
+export function linkPreviewUrl(link: string, width = 400): string {
+  const url = link.trim();
+  if (parseCloudinaryUrl(url)) return thumbUrl(url, "image", width);
+  const id = parseDriveId(url);
+  if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
+  return url;
 }

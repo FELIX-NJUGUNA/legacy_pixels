@@ -30,7 +30,7 @@ export default async function EditProjectPage({
           title: project.title,
           category_id: project.category_id ?? "",
           year: project.year ?? "",
-          aspect: project.aspect ?? "landscape",
+          aspect: project.aspect,
           tags: (project.tags ?? []).join(", "),
           published: project.published,
           media_url: project.media_url,
