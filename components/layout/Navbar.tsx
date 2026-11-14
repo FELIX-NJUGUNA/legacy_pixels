@@ -5,14 +5,12 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { label: "Work", href: "/#portfolio" },
-  { label: "About", href: "/about" },
+  { label: "About", href: "/#about" },
+  { label: "Portfolio", href: "/#portfolio" },
   { label: "Services", href: "/#services" },
   { label: "Packages", href: "/#packages" },
-
-  { label: "Contact", href: "/contact" },
+  { label: "Contact", href: "/#contact" },
 ];
-
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
