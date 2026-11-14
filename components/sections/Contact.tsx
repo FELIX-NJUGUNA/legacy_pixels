@@ -2,11 +2,31 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Mail, MapPin, Clock } from "lucide-react";
+import { Mail, MapPin, Clock, ChevronDown } from "lucide-react";
+
+/* Same field treatment as the admin login: solid dark fill, soft border, gold focus ring */
+const fieldClass =
+  "w-full rounded-sm border border-white/15 bg-[#101014] px-4 py-3.5 text-sm text-silk " +
+  "placeholder:text-mist/40 outline-none transition-colors duration-300 " +
+  "hover:border-white/30 focus:border-gold focus-visible:ring-2 focus-visible:ring-gold/30";
+
+const labelClass = "mb-2 block text-xs text-mist/70";
+
+const services = [
+  { value: "editorial", label: "Editorial Photography" },
+  { value: "wedding", label: "Wedding Film & Photography" },
+  { value: "commercial", label: "Commercial & Brand" },
+  { value: "film", label: "Short & Documentary Film" },
+];
+
+const contactItems = [
+  { Icon: Mail, label: "Email", value: "hello@legacypixels.co.ke" },
+  { Icon: MapPin, label: "Location", value: "Nairobi, Kenya" },
+  { Icon: Clock, label: "Response Time", value: "Within 24 hours" },
+];
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [focused, setFocused] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -17,27 +37,18 @@ export default function Contact() {
         }),
       { threshold: 0.1 }
     );
-    sectionRef.current?.querySelectorAll(".section-reveal").forEach((el) =>
-      observer.observe(el)
-    );
+    sectionRef.current
+      ?.querySelectorAll(".section-reveal")
+      .forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // const data = Object.fromEntries(new FormData(e.currentTarget));
+    // Send `data` to your API route / email service here.
     setSubmitted(true);
   };
-
-  const inputClasses = (name: string) =>
-    `w-full bg-transparent border-b py-4 text-sm text-silk placeholder:text-mist/30 outline-none transition-all duration-300 ${
-      focused === name ? "border-gold" : "border-white/10"
-    }`;
-
-  const contactItems = [
-    { Icon: Mail, label: "Email", value: "hello@legacypixels.co.ke" },
-    { Icon: MapPin, label: "Location", value: "Nairobi, Kenya" },
-    { Icon: Clock, label: "Response Time", value: "Within 24 hours" },
-  ];
 
   return (
     <section
@@ -45,7 +56,19 @@ export default function Contact() {
       ref={sectionRef}
       className="py-32 px-6 md:px-12 max-w-screen-xl mx-auto"
     >
-      <div className="grid md:grid-cols-2 gap-24">
+      {/* Keeps autofilled fields on theme instead of browser light blue/white */}
+      <style>{`
+        .contact-field:-webkit-autofill,
+        .contact-field:-webkit-autofill:hover,
+        .contact-field:-webkit-autofill:focus {
+          -webkit-text-fill-color: #f5f0ea;
+          -webkit-box-shadow: 0 0 0 1000px #101014 inset;
+          box-shadow: 0 0 0 1000px #101014 inset;
+          transition: background-color 9999s ease-in-out 0s;
+        }
+      `}</style>
+
+      <div className="grid md:grid-cols-2 gap-16 md:gap-24">
         {/* Left */}
         <div className="section-reveal">
           <p className="label-text mb-6">Let&apos;s Talk</p>
@@ -75,74 +98,107 @@ export default function Contact() {
         </div>
 
         {/* Right: Form */}
-        <div className="section-reveal">
+        <div className="section-reveal" style={{ colorScheme: "dark" }}>
           {!submitted ? (
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
+                  <label htmlFor="contact-fname" className={labelClass}>
+                    First name
+                  </label>
                   <input
+                    id="contact-fname"
+                    name="firstName"
                     type="text"
-                    placeholder="First name"
+                    autoComplete="given-name"
+                    placeholder="Jane"
                     required
-                    className={inputClasses("fname")}
-                    onFocus={() => setFocused("fname")}
-                    onBlur={() => setFocused(null)}
+                    className={`contact-field ${fieldClass}`}
                   />
                 </div>
                 <div>
+                  <label htmlFor="contact-lname" className={labelClass}>
+                    Last name
+                  </label>
                   <input
+                    id="contact-lname"
+                    name="lastName"
                     type="text"
-                    placeholder="Last name"
+                    autoComplete="family-name"
+                    placeholder="Doe"
                     required
-                    className={inputClasses("lname")}
-                    onFocus={() => setFocused("lname")}
-                    onBlur={() => setFocused(null)}
+                    className={`contact-field ${fieldClass}`}
                   />
                 </div>
               </div>
 
-              <input
-                type="email"
-                placeholder="Email address"
-                required
-                className={inputClasses("email")}
-                onFocus={() => setFocused("email")}
-                onBlur={() => setFocused(null)}
-              />
+              <div>
+                <label htmlFor="contact-email" className={labelClass}>
+                  Email address
+                </label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  placeholder="you@example.com"
+                  required
+                  className={`contact-field ${fieldClass}`}
+                />
+              </div>
 
-              <select
-                className={`${inputClasses("service")} appearance-none`}
-                onFocus={() => setFocused("service")}
-                onBlur={() => setFocused(null)}
-              >
-                <option value="" className="bg-obsidian">
-                  Select a service
-                </option>
-                <option value="editorial" className="bg-obsidian">
-                  Editorial Photography
-                </option>
-                <option value="wedding" className="bg-obsidian">
-                  Wedding Film & Photography
-                </option>
-                <option value="commercial" className="bg-obsidian">
-                  Commercial & Brand
-                </option>
-                <option value="film" className="bg-obsidian">
-                  Short & Documentary Film
-                </option>
-              </select>
+              <div>
+                <label htmlFor="contact-service" className={labelClass}>
+                  Service
+                </label>
+                <div className="relative">
+                  <select
+                    id="contact-service"
+                    name="service"
+                    defaultValue=""
+                    className={`contact-field ${fieldClass} appearance-none pr-11 cursor-pointer invalid:text-mist/40`}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select a service
+                    </option>
+                    {services.map((s) => (
+                      <option
+                        key={s.value}
+                        value={s.value}
+                        className="bg-[#101014] text-silk"
+                      >
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={16}
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                    className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-mist/60"
+                  />
+                </div>
+              </div>
 
-              <textarea
-                placeholder="Tell us about your project..."
-                rows={4}
-                className={`${inputClasses("message")} resize-none`}
-                onFocus={() => setFocused("message")}
-                onBlur={() => setFocused(null)}
-              />
+              <div>
+                <label htmlFor="contact-message" className={labelClass}>
+                  Your project
+                </label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows={5}
+                  placeholder="Tell us about your project, date and location…"
+                  required
+                  className={`contact-field ${fieldClass} resize-none`}
+                />
+              </div>
 
               <button
                 type="submit"
-                className="relative overflow-hidden border border-gold text-gold hover:text-void transition-colors duration-400 label-text px-10 py-4 w-full group"
+                className="relative overflow-hidden border border-gold text-gold hover:text-void transition-colors duration-400 label-text px-10 py-4 w-full group rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-void"
               >
                 <span className="relative z-10">Send Message →</span>
                 <span className="absolute inset-0 bg-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-400 ease-[cubic-bezier(0.23,1,0.32,1)]" />
@@ -150,6 +206,7 @@ export default function Contact() {
             </form>
           ) : (
             <motion.div
+              role="status"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="h-full flex flex-col justify-center items-start py-20"
@@ -161,10 +218,17 @@ export default function Contact() {
               >
                 Message Sent.
               </h3>
-              <p className="text-mist text-sm">
+              <p className="text-mist text-sm mb-8">
                 We&apos;ll be in touch within 24 hours. In the meantime, explore
                 our portfolio.
               </p>
+              <button
+                type="button"
+                onClick={() => setSubmitted(false)}
+                className="text-xs text-gold/80 underline underline-offset-4 hover:text-gold transition-colors"
+              >
+                Send another message
+              </button>
             </motion.div>
           )}
         </div>
